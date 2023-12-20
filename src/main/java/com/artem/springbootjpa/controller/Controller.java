@@ -1,51 +1,50 @@
 package com.artem.springbootjpa.controller;
 
-import com.artem.springbootjpa.dao.EmployeeRepository;
 import com.artem.springbootjpa.entity.Employee;
-import com.artem.springbootjpa.service.EmployeeService;
+import com.artem.springbootjpa.service.EmployeeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class Controller {
 
-//    @Autowired
-//    private EmployeeService employeeService;
-
     @Autowired
-    private EmployeeRepository employeeRepository;
+    private EmployeeServiceImpl employeeService;
 
     @GetMapping("/employees")
     public List<Employee> showAllEmployees() {
-        List<Employee> allEmployees = employeeRepository.findAll();
+        List<Employee> allEmployees = employeeService.getAllEmployees();
         return allEmployees;
     }
 
     @GetMapping("/employees/{id}")
-    public Employee getEmployee(@PathVariable int id) {
-        return employeeRepository.getReferenceById(id);
+    public Optional<Employee> getEmployee(@PathVariable int id) {
+        Optional<Employee> employee = employeeService.getEmployeeById(id);
+        return employee;
     }
 
     @PostMapping("/employees")
     public Employee addEmployee(@RequestBody Employee employee) {
-        employeeRepository.save(employee);
+        employeeService.saveEmployee(employee);
         return employee;
     }
-
+    @PutMapping("/employees/{id}")
+    public Employee updateEmployee(@PathVariable int id , @RequestBody Employee employee) {
+        return employeeService.updateEmployee(id,employee);
+    }
     @DeleteMapping("/employees/{id}")
     public String deleteEmployee(@PathVariable int id) {
-        Employee employee = employeeRepository.getReferenceById(id);
-        employeeRepository.delete(employee);
+        employeeService.deleteEmployee(id);
         return "Employee was deleted, id=" + id;
     }
 
     @GetMapping("/employees/name/{name}")
     public List<Employee> showAllEmployeesByName(@PathVariable String name){
-        List<Employee> employees = employeeRepository.findAllByName(name);
-        return employees;
+        return employeeService.findAllByName(name);
     }
 
 }
